@@ -1,7 +1,6 @@
 from PIL import Image
 from PIL import ImageChops
 from PIL import ImageDraw
-import requests
 import random
 from typing import Tuple
 
@@ -67,7 +66,7 @@ def main():
     new_image = Image.new('RGB', base_image.size)
     new_image_draw = ImageDraw.Draw(new_image)
     for i in range(ROUNDS):
-        base_rectangles = [random_rectangle_from_image(new_image) for r in range(NUM_BASE_RECTANGLES)]
+        base_rectangles = [random_rectangle_from_image(new_image) for _ in range(NUM_BASE_RECTANGLES)]
         score_count = 0
         for rect in base_rectangles:
             score_count += 1
@@ -81,7 +80,7 @@ def main():
         top_rectangles: list[Rectangle] = base_rectangles[:10]
         percent = BASE_PERCENT
         for j in range(SUB_ROUNDS):
-            deviated_rects = top_rectangles + [r for rect in top_rectangles for r in [rect.deviate(percent, new_image.width, new_image.height) for i in range(NUM_SUB_RECTANGLES)]]
+            deviated_rects = top_rectangles + [r for rect in top_rectangles for r in [rect.deviate(percent, new_image.width, new_image.height) for _ in range(NUM_SUB_RECTANGLES)]]
             sub_score_count = 0
             for rect in deviated_rects:
                 sub_score_count += 1
