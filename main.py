@@ -2,6 +2,7 @@ from PIL import Image
 from PIL import ImageChops
 from PIL import ImageDraw
 import random
+import multiprocessing
 from typing import Tuple
 
 ROUNDS = 500
@@ -60,6 +61,14 @@ def compare_images(image1: Image.Image, image2: Image.Image) -> int:
             score += sum(combined_image.getpixel((i, j)))
     return score
 
+def score_rectangle(rectangle: Rectangle, new_image: Image.Image, base_image: Image.Image) -> Rectangle:
+    temp_img = new_image.copy()
+    draw_image = ImageDraw.Draw(temp_img)
+    draw_image.rectangle(rectangle.to_tuple(), fill=rectangle.color)
+    rectangle.score = compare_images(temp_img, base_image)
+    temp_img.close()
+    return rectangle
+
 def main():
     base_image = Image.open('finn.jpg').convert('RGB')
     base_image.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE), Image.LANCZOS)
@@ -67,39 +76,28 @@ def main():
     new_image_draw = ImageDraw.Draw(new_image)
     for i in range(ROUNDS):
         base_rectangles = [random_rectangle_from_image(new_image) for _ in range(NUM_BASE_RECTANGLES)]
-        score_count = 0
-        for rect in base_rectangles:
-            score_count += 1
-            temp_img = new_image.copy()
-            draw_image = ImageDraw.Draw(temp_img)
-            draw_image.rectangle(rect.to_tuple(), fill=rect.color)
-            rect.score = compare_images(temp_img, base_image)
-            print('score for rect', score_count, rect.score)
-            temp_img.close()
+        pool_data = [(r, new_image, base_image) for r in base_rectangles]
+        with multiprocessing.Pool(4) as pool:
+            base_rectangles = pool.starmap(score_rectangle, pool_data)
         base_rectangles.sort(key=lambda r: r.score)
         top_rectangles: list[Rectangle] = base_rectangles[:10]
         percent = BASE_PERCENT
-        for j in range(SUB_ROUNDS):
+        for _ in range(SUB_ROUNDS):
             deviated_rects = top_rectangles + [r for rect in top_rectangles for r in [rect.deviate(percent, new_image.width, new_image.height) for _ in range(NUM_SUB_RECTANGLES)]]
-            sub_score_count = 0
-            for rect in deviated_rects:
-                sub_score_count += 1
-                if rect.score == 0:
-                    temp_img = new_image.copy()
-                    draw_image = ImageDraw.Draw(temp_img)
-                    draw_image.rectangle(rect.to_tuple(), fill=rect.color)
-                    rect.score = compare_images(temp_img, base_image)
-                    temp_img.close()
-                print('score for round', j,'rect', sub_score_count, rect.score)
+            deiviated_pool_data = [(r, new_image, base_image) for r in deviated_rects]
+            with multiprocessing.Pool(4) as pool:
+                deviated_rects = pool.starmap(score_rectangle, deiviated_pool_data)
             deviated_rects.sort(key=lambda r: r.score)
             top_rectangles = deviated_rects[:10]
             percent -= (percent/(SUB_ROUNDS - 1))
         best_rect = top_rectangles[0]
+        print('Best rectangle score:', best_rect.score, 'iteration:', i)
         new_image_draw.rectangle(best_rect.to_tuple(), fill=best_rect.color)
         new_image.save('hot-mess-{0}.png'.format(i))
     new_image.save('hot-mess.png')
 
-main()
+if __name__ == '__main__':
+    main()
 
 
 
