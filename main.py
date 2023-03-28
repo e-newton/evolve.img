@@ -4,7 +4,6 @@ from PIL import ImageDraw
 import requests
 import random
 from typing import Tuple
-from io import BytesIO
 
 ROUNDS = 500
 SUB_ROUNDS = 10
@@ -63,8 +62,6 @@ def compare_images(image1: Image.Image, image2: Image.Image) -> int:
     return score
 
 def main():
-    res = requests.get(url)
-    # base_image = Image.open(BytesIO(res.content)).convert('RGB')
     base_image = Image.open('finn.jpg').convert('RGB')
     base_image.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE), Image.LANCZOS)
     new_image = Image.new('RGB', base_image.size)
