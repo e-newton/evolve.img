@@ -8,7 +8,7 @@ from typing import Tuple, cast
 import numpy
 from numpy._typing import NDArray
 
-ROUNDS = 500
+ROUNDS = 2000
 SUB_ROUNDS = 10
 NUM_BASE_RECTANGLES = 100
 NUM_SUB_RECTANGLES = floor(sqrt(NUM_BASE_RECTANGLES))
@@ -93,7 +93,7 @@ def start_multi_rectangle_scores(
 
 
 def main():
-    base_image = Image.open('IMG_0749.jpeg').convert('RGB')
+    base_image = Image.open('finn.jpg').convert('RGB')
     base_image_size = base_image.size
     base_image.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE), Image.LANCZOS)
     base_image_colors = cast(list[tuple[int, int, int]], [color[1] for color in base_image.getcolors(maxcolors=base_image.height * base_image.width)])
@@ -132,8 +132,7 @@ def main():
         else:
             print('Round did not end with a good enough score')
     pool.close()
-    new_image.resize(base_image_size, Image.NEAREST)
-    new_image.save('hot-mess-final.png')
+    new_image.resize(base_image_size, Image.NEAREST).save('hot-mess-final.png')
 
 if __name__ == '__main__':
     main()
