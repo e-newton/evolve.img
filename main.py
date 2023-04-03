@@ -69,6 +69,7 @@ def compare_images(image1: NDArray[numpy.int64], image2: NDArray[numpy.int64]) -
     return numpy.sum(numpy.abs(image1 - image2))
 
 def score_rectangle(rectangle: Rectangle, new_image_array: NDArray[numpy.int64], base_image_array: NDArray[numpy.int64]) -> Rectangle:
+    # Until I can figure out how to properally add a rectangle to the array this is just how it be
     temp_img = Image.fromarray(new_image_array.astype(numpy.uint8))
     temp_img_draw = ImageDraw.ImageDraw(temp_img)
     temp_img_draw.rectangle(rectangle.to_tuple(), rectangle.color)
