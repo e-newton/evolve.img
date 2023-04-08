@@ -17,7 +17,6 @@ class Rectangle(BaseObject):
         self.y2 = random.randint(self.y1, image.height - 1)
         self.image = image
         self.color_palette = color_palette
-        self.score = 0
 
 
     def deviate(self, percent: float, max_width: int, max_height: int) -> Rectangle:

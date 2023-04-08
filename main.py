@@ -4,6 +4,7 @@ from PIL import Image
 import multiprocessing
 from typing import cast
 from evolve_objects.rectangle import Rectangle
+from evolve_objects.circle import Circle
 from evolve_objects.object import BaseObject
 import numpy
 from numpy._typing import NDArray
@@ -58,7 +59,7 @@ def main():
     num_processess = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(num_processess)
     # Cast to parent class to make abstract
-    object: type[BaseObject] = cast(type[BaseObject], Rectangle)
+    object: type[BaseObject] = cast(type[BaseObject], Circle)
     while round < ROUNDS:
         print('Creating base objects for round', round)
         base_objects = [object(new_image, base_image_colors) for _ in range(NUM_BASE_RECTANGLES)]
