@@ -9,10 +9,11 @@ from evolve_objects.factories.emoji_factory import EmojiFactory
 from evolve_objects.rectangle import Rectangle
 from evolve_objects.circle import Circle
 from evolve_objects.object import BaseObject
+from utils.gif_creator import GifCreator
 import numpy
 from numpy._typing import NDArray
 
-ROUNDS = 100
+ROUNDS = 50
 SUB_ROUNDS = 20
 NUM_BASE_RECTANGLES = 100
 NUM_SUB_RECTANGLES = floor(sqrt(NUM_BASE_RECTANGLES))
@@ -53,8 +54,6 @@ def main():
     base_image.thumbnail((MAX_IMAGE_SIZE, MAX_IMAGE_SIZE), Image.LANCZOS)
     base_image_colors = cast(list[tuple[int, int, int]], [color[1] for color in base_image.getcolors(maxcolors=base_image.height * base_image.width)])
     new_image = Image.new('RGB', base_image.size)
-    gif_image = Image.new('RGB', base_image_size)
-    gif_image.save('hot-mess-gif.gif', format='GIF')
     new_image_array = numpy.array(new_image).astype(numpy.int64)
     base_image_array = numpy.array(base_image).astype(numpy.int64)
     round = 0
@@ -85,12 +84,14 @@ def main():
             round += 1
             prev_best_score = best_rect.score
             best_rect.place_on_image(new_image);
+            GifCreator.instance().save_frame(new_image.resize(base_image_size, Image.NEAREST), round)
             new_image_array = numpy.array(new_image).astype(numpy.int64)
             print('Best object score:', best_rect.score, 'iteration:', round)
         else:
             print('Round did not end with a good enough score')
     pool.close()
     new_image.resize(base_image_size, Image.NEAREST).save('hot-mess-final.png')
+    GifCreator.instance().create_gif('hot-mess-gif.gif', base_image_size)
     EmojiFactory.instance().destroy()
 
 if __name__ == '__main__':
