@@ -1,5 +1,4 @@
 from __future__ import annotations
-from typing import Tuple
 from PIL import ImageDraw
 from PIL import Image
 from evolve_objects.object import BaseObject
@@ -7,11 +6,12 @@ from evolve_objects.rectangle import clamp
 import random
 
 class Circle(BaseObject):
-    def __init__(self, image: Image.Image, color_palette: list[tuple[int, int, int]]):
-        self.color = random.choice(color_palette)
-        self.x = random.randint(0, image.width - 1)
-        self.y = random.randint(0, image.height - 1)
-        self.r = random.randint(0, min(image.width, image.height))
+    def __init__(self, create_new: bool, image: Image.Image, color_palette: list[tuple[int, int, int]]):
+        if create_new:
+            self.color = random.choice(color_palette)
+            self.x = random.randint(0, image.width - 1)
+            self.y = random.randint(0, image.height - 1)
+            self.r = random.randint(0, min(image.width, image.height))
         self.image = image
         self.color_palette = color_palette
 
@@ -26,7 +26,7 @@ class Circle(BaseObject):
         new_r = clamp(self.color[0] + random.randint(-colorRange, colorRange), 0, 255)
         new_g = clamp(self.color[1] + random.randint(-colorRange, colorRange), 0, 255)
         new_b = clamp(self.color[2] + random.randint(-colorRange, colorRange), 0, 255)
-        return_circle = Circle(self.image, self.color_palette)
+        return_circle = Circle(False, self.image, self.color_palette)
         return_circle.x = x
         return_circle.y = y
         return_circle.r = r

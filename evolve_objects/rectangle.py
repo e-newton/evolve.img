@@ -9,12 +9,13 @@ def clamp(n: int, min_num: int, max_num: int) -> int:
     return max(min_num, min(n, max_num))
 
 class Rectangle(BaseObject):
-    def __init__(self, image: Image.Image, color_palette: list[tuple[int, int, int]]):
-        self.color = random.choice(color_palette)
-        self.x1 = random.randint(0, image.width - 1)
-        self.x2 = random.randint(self.x1, image.width - 1)
-        self.y1 = random.randint(0, image.height - 1)
-        self.y2 = random.randint(self.y1, image.height - 1)
+    def __init__(self, create_new: bool, image: Image.Image, color_palette: list[tuple[int, int, int]]):
+        if create_new:
+            self.color = random.choice(color_palette)
+            self.x1 = random.randint(0, image.width - 1)
+            self.x2 = random.randint(self.x1, image.width - 1)
+            self.y1 = random.randint(0, image.height - 1)
+            self.y2 = random.randint(self.y1, image.height - 1)
         self.image = image
         self.color_palette = color_palette
 
@@ -30,7 +31,7 @@ class Rectangle(BaseObject):
         new_r = clamp(self.color[0] + random.randint(-colorRange, colorRange), 0, 255)
         new_g = clamp(self.color[1] + random.randint(-colorRange, colorRange), 0, 255)
         new_b = clamp(self.color[2] + random.randint(-colorRange, colorRange), 0, 255)
-        return_rect = Rectangle(self.image, self.color_palette)
+        return_rect = Rectangle(False, self.image, self.color_palette)
         return_rect.x1 = min(x1, x2)
         return_rect.x2 = max(x1, x2)
         return_rect.y1 = min(y1, y2)
