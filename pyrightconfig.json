@@ -1,6 +1,7 @@
 {
   "include": [
     "evolve_objects",
-    "evolve_objects/factories"
+    "evolve_objects/factories",
+    "utils"
   ]
 }
