@@ -1,6 +1,6 @@
-*.png
+**/*.png
 *__pycache__*
 .env
-*.gif
-*.jpg
-*.sqlite3
+**/*.gif
+**/*.jpg
+**/*.sqlite3
