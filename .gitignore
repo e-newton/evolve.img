@@ -3,3 +3,4 @@
 .env
 *.gif
 *.jpg
+*.sqlite3
