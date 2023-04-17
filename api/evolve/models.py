@@ -1,5 +1,4 @@
 import os
-from random import choices
 from django.db import models
 from PIL import Image
 from evolve_objects import EvolveObject
