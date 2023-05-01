@@ -45,24 +45,35 @@ class GeneratorMessageContent(Enum):
     GENERATE = 'GENERATE'
     VERBOSE = 'VERBOSE'
     NON_VERBOSE = 'NON_VERBOSE'
+    SEND_STATUS = 'SEND_STATUS'
+    RECIEVED_STATUS = 'RECIEVED_STATUS'
 
 class GeneratorMessage():
-    def __init__(self, message: GeneratorMessageContent, path: Optional[str], object: Optional[Type[BaseObject]]):
+    def __init__(self, message: GeneratorMessageContent, path: Optional[str], object: Optional[Type[BaseObject]], status: Optional[str]):
         self.message = message
         self.path = path
+        self.status = status
         self.object = object
 
     @classmethod
     def stop(cls) -> GeneratorMessage:
-        return GeneratorMessage(GeneratorMessageContent.STOP, None, None)
+        return GeneratorMessage(GeneratorMessageContent.STOP, None, None, None)
 
     @classmethod
     def generate(cls, path: str, object: Type[BaseObject]) -> GeneratorMessage:
-        return GeneratorMessage(GeneratorMessageContent.GENERATE, path, object)
+        return GeneratorMessage(GeneratorMessageContent.GENERATE, path, object, None)
 
     @classmethod
     def set_verbose(cls, value: bool) -> GeneratorMessage:
-        return GeneratorMessage(GeneratorMessageContent.VERBOSE if value else GeneratorMessageContent.NON_VERBOSE, None, None)
+        return GeneratorMessage(GeneratorMessageContent.VERBOSE if value else GeneratorMessageContent.NON_VERBOSE, None, None, None)
+
+    @classmethod
+    def send_status(cls) -> GeneratorMessage:
+        return GeneratorMessage(GeneratorMessageContent.SEND_STATUS, None, None, None)
+
+    @classmethod
+    def recv_status(cls, status: str) -> GeneratorMessage:
+        return GeneratorMessage(GeneratorMessageContent.RECIEVED_STATUS, None, None, status)
 
 class EvolveGenerator():
 
@@ -95,7 +106,10 @@ class EvolveGenerator():
                     self._generating_thread = threading.Thread(target = self._watch_generatoring_queue)
                     self._generating_thread.start()
                 self._generating_job_queue.append(current_message)
-            time.sleep(0.1)
+            elif current_message.message == GeneratorMessageContent.SEND_STATUS:
+                self._queue.put(GeneratorMessage.recv_status(str(len(self._generating_job_queue))))
+            elif current_message.message == GeneratorMessageContent.RECIEVED_STATUS:
+                self._queue.put(current_message)
 
 
 
